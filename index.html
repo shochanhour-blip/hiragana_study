@@ -648,10 +648,8 @@
   let currentTile = null;
   const toast = document.getElementById('speech-toast');
   let toastTimer = null;
-  let voiceKey = localStorage.getItem('hiragana_voice') || 'female';
-
   function currentMap() {
-    return voiceKey === 'male' ? AUDIO_MAP_MALE : AUDIO_MAP_FEMALE;
+    return AUDIO_MAP_MALE;
   }
 
   function speak(char, tileEl) {

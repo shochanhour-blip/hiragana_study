@@ -653,19 +653,37 @@
   }
 
   function speak(char, tileEl) {
-    const b64 = currentMap()[char];
-    if (!b64) return;
-    const audio = new Audio('data:audio/wav;base64,' + b64);
-    audio.playbackRate = 0.92;
     if (currentTile) currentTile.classList.remove('playing');
     currentTile = tileEl;
     tileEl.classList.add('playing');
     showToast(char);
-    audio.play();
-    audio.onended = () => {
+
+    const done = () => {
       tileEl.classList.remove('playing');
       currentTile = null;
     };
+
+    const b64 = typeof AUDIO_MAP_MALE !== 'undefined' && AUDIO_MAP_MALE[char];
+    if (b64) {
+      const audio = new Audio('data:audio/wav;base64,' + b64);
+      audio.playbackRate = 0.92;
+      audio.onended = done;
+      audio.onerror = () => { speakFallback(char); done(); };
+      audio.play().catch(() => { speakFallback(char); done(); });
+    } else {
+      speakFallback(char);
+      setTimeout(done, 1500);
+    }
+  }
+
+  function speakFallback(char) {
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(char);
+    u.lang = 'ja-JP';
+    u.rate = 0.8;
+    const v = window.speechSynthesis.getVoices().find(v => /^ja/.test(v.lang));
+    if (v) u.voice = v;
+    window.speechSynthesis.speak(u);
   }
 
   function showToast(char) {

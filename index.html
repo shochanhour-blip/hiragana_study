@@ -486,6 +486,11 @@
 
     #clear-word-btn:hover { background: #e5e7eb; }
 
+    /* タッチ操作中はブラウザスクロールを抑制 */
+    .tile {
+      touch-action: none;
+    }
+
     /* drag ghost */
     #drag-ghost {
       position: fixed;
@@ -824,12 +829,14 @@
     const startY = e.clientY;
     let dragging = false;
 
+    // タブレット対応: ポインターをキャプチャして指が要素外に出てもイベントが届くようにする
+    tileEl.setPointerCapture(e.pointerId);
+
     function onMove(ev) {
       const dx = ev.clientX - startX;
       const dy = ev.clientY - startY;
       if (!dragging && Math.sqrt(dx * dx + dy * dy) > 8) {
         dragging = true;
-        e.preventDefault();
         ghost = document.createElement('div');
         ghost.id = 'drag-ghost';
         ghost.textContent = char;
@@ -838,7 +845,6 @@
         document.body.appendChild(ghost);
       }
       if (dragging) {
-        ev.preventDefault();
         ghost.style.left = ev.clientX + 'px';
         ghost.style.top  = ev.clientY + 'px';
         const dz   = document.getElementById('drop-zone');
@@ -849,9 +855,10 @@
       }
     }
 
-    function onUp(ev) {
-      document.removeEventListener('pointermove', onMove);
-      document.removeEventListener('pointerup',   onUp);
+    function onEnd(ev) {
+      tileEl.removeEventListener('pointermove', onMove);
+      tileEl.removeEventListener('pointerup',   onEnd);
+      tileEl.removeEventListener('pointercancel', onEnd);
       const dz = document.getElementById('drop-zone');
       dz.classList.remove('drag-over');
       if (dragging) {
@@ -866,8 +873,9 @@
       }
     }
 
-    document.addEventListener('pointermove', onMove);
-    document.addEventListener('pointerup',   onUp);
+    tileEl.addEventListener('pointermove', onMove);
+    tileEl.addEventListener('pointerup',   onEnd);
+    tileEl.addEventListener('pointercancel', onEnd);
   }
 
   let katakanaMode = false;

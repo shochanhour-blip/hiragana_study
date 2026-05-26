@@ -182,91 +182,6 @@
       color: white;
     }
 
-    /* ===== ANNOTATION SETTINGS ===== */
-    .anno-section {
-      padding-top: 16px;
-      margin-top: 4px;
-      margin-bottom: 20px;
-      border-top: 1px solid #eee;
-    }
-
-    .anno-section-label {
-      font-size: .8rem;
-      font-weight: bold;
-      color: #888;
-      letter-spacing: .04em;
-      margin-bottom: 8px;
-    }
-
-    #annotation-input {
-      width: 100%;
-      padding: 10px 12px;
-      border: 2px solid #eee;
-      border-radius: 10px;
-      font-size: .95rem;
-      font-family: inherit;
-      outline: none;
-      transition: border-color .15s;
-      margin-bottom: 10px;
-      background: #fff !important;
-      color: #222 !important;
-      -webkit-text-fill-color: #222;
-      color-scheme: light;
-      opacity: 1;
-    }
-
-    #annotation-input:focus {
-      border-color: var(--accent);
-    }
-
-    .pos-label {
-      font-size: .75rem;
-      color: #aaa;
-      margin-bottom: 6px;
-    }
-
-    .pos-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 6px;
-    }
-
-    .pos-btn {
-      padding: 7px 4px;
-      border: 2px solid #eee;
-      border-radius: 10px;
-      background: #f8f8f8;
-      font-size: .82rem;
-      font-family: inherit;
-      cursor: pointer;
-      transition: all .15s;
-    }
-
-    .pos-btn.active {
-      border-color: var(--accent);
-      background: var(--accent);
-      color: white;
-      font-weight: bold;
-    }
-
-    /* ===== ANNOTATION DISPLAY ===== */
-    #annotation-display {
-      position: fixed;
-      font-size: .68rem;
-      color: rgba(0,0,0,.28);
-      pointer-events: none;
-      z-index: 10;
-      max-width: 140px;
-      word-break: break-all;
-      line-height: 1.4;
-      display: none;
-    }
-
-    #annotation-display.has-text { display: block; }
-    #annotation-display.pos-tr { top: 10px; right: 10px; text-align: right; }
-    #annotation-display.pos-tl { top: 10px; left: 10px; }
-    #annotation-display.pos-br { bottom: 10px; right: 10px; text-align: right; }
-    #annotation-display.pos-bl { bottom: 10px; left: 10px; }
 
     /* ===== MAIN TILES ===== */
     main {
@@ -660,26 +575,13 @@
     <h2>ひょうじする ぎょうを えらぼう</h2>
 
     <div class="row-grid" id="row-grid"></div>
-    <div class="anno-section">
-      <div class="anno-section-label">注釈</div>
-      <input type="text" id="annotation-input" placeholder="例：なまえ、クラスなど" maxlength="30" />
-      <div class="pos-label">表示位置</div>
-      <div class="pos-grid">
-        <button class="pos-btn" data-pos="tl">左上</button>
-        <button class="pos-btn" data-pos="tr">右上</button>
-        <button class="pos-btn" data-pos="bl">左下</button>
-        <button class="pos-btn" data-pos="br">右下</button>
-      </div>
-    </div>
-
-    <div class="settings-actions">
+<div class="settings-actions">
       <button id="btn-all">ぜんぶ</button>
       <button id="btn-close">とじる</button>
     </div>
   </div>
 </div>
 
-<div id="annotation-display"></div>
 
 <script>
   // ===== DATA =====
@@ -1073,49 +975,8 @@
     updateWordPanel();
   });
 
-  // ===== ANNOTATION =====
-  const ANNO_KEY     = 'hiragana_annotation';
-  const ANNO_POS_KEY = 'hiragana_annotation_pos';
-
-  function getAnnoPos() {
-    return localStorage.getItem(ANNO_POS_KEY) || 'tr';
-  }
-
-  function refreshAnnotationDisplay() {
-    const input = document.getElementById('annotation-input');
-    const el    = document.getElementById('annotation-display');
-    const text  = input ? input.value : (localStorage.getItem(ANNO_KEY) || '');
-    const pos   = getAnnoPos();
-    el.textContent = text;
-    el.className   = (text.trim() ? 'has-text ' : '') + 'pos-' + pos;
-  }
-
-  function initAnnotation() {
-    const input = document.getElementById('annotation-input');
-    input.value = localStorage.getItem(ANNO_KEY) || '';
-
-    const pos = getAnnoPos();
-    document.querySelectorAll('.pos-btn').forEach(btn => {
-      btn.classList.toggle('active', btn.dataset.pos === pos);
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.pos-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        localStorage.setItem(ANNO_POS_KEY, btn.dataset.pos);
-        refreshAnnotationDisplay();
-      });
-    });
-
-    input.addEventListener('input', () => {
-      localStorage.setItem(ANNO_KEY, input.value);
-      refreshAnnotationDisplay();
-    });
-
-    refreshAnnotationDisplay();
-  }
-
   // ===== INIT =====
   render();
-  initAnnotation();
 </script>
 </body>
 </html>

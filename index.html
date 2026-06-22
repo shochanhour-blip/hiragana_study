@@ -930,12 +930,7 @@
     const btn  = document.getElementById('speak-word-btn');
     btn.disabled = true;
 
-    // AUDIO_MAP_WORD があればそちらを使い、なければ Web Speech API
-    if (typeof AUDIO_MAP_WORD !== 'undefined') {
-      for (const t of tiles) await playCharAsync(t.dataset.char);
-    } else {
-      await speakWithSynthesis(word);
-    }
+    await speakWithSynthesis(word);
     btn.disabled = false;
   }
 
